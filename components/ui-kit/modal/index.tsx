@@ -9,23 +9,25 @@ import { Modals } from '@/utils/constants';
 import { useModalState } from '@/hooks/use-modal-state';
 
 interface ModalProps {
-  onAfterClose?: () => void;
-  modalName: Modals;
-  canBeOpened: boolean;
+  modalId: Modals;
+  canBeRendered: boolean;
   scrollOnClose?: boolean;
   children?: ReactNode;
+  destroyImmediately?: boolean;
+  onAfterClose?: () => void;
   renderContent?: (closeHandler: () => void) => ReactNode;
 }
 
 const Modal: FC<ModalProps> = ({
-  modalName,
+  modalId,
   scrollOnClose = false,
-  canBeOpened,
+  canBeRendered,
+  destroyImmediately,
   children,
   onAfterClose,
   renderContent,
 }) => {
-  const { isModalOpened, mountedPopup } = useModalState({ onAfterUnmount: onAfterClose });
+  const { isModalOpened, mountedPopup } = useModalState({ onAfterUnmount: onAfterClose, destroyImmediately });
 
   const pathname = usePathname();
   const router = useRouter();
@@ -35,6 +37,8 @@ const Modal: FC<ModalProps> = ({
     [pathname, router, scrollOnClose],
   );
 
+  const content = renderContent ? renderContent(closeHandler) : children;
+
   useEffect(() => {
     const closeModalByEsc = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
@@ -42,20 +46,18 @@ const Modal: FC<ModalProps> = ({
       }
     };
 
-    if (canBeOpened && mountedPopup === modalName) {
+    if (canBeRendered && mountedPopup === modalId) {
       document.addEventListener('keydown', closeModalByEsc);
 
       return () => {
         document.removeEventListener('keydown', closeModalByEsc);
       };
     }
-  }, [canBeOpened, closeHandler, modalName, mountedPopup]);
-
-  const content = renderContent ? renderContent(closeHandler) : children;
+  }, [canBeRendered, closeHandler, modalId, mountedPopup]);
 
   return (
     <>
-      {canBeOpened && mountedPopup === modalName && (
+      {canBeRendered && mountedPopup === modalId && (
         <div
           className={cn(styles.modal, { [styles.modal_isClosing]: !isModalOpened })}
           role="dialog"
@@ -64,7 +66,7 @@ const Modal: FC<ModalProps> = ({
         >
           <div className={styles.modal__content} onClick={(e) => e.stopPropagation()}>
             {content}
-            
+
             <button
               className={styles.modal__closeBtn}
               type="button"

@@ -11,13 +11,13 @@ export default function Home() {
       <Link href={`/?modal=${Modals.CONFIRM}`}>{'Open "Welcome" modal'}</Link>
 
       <Suspense fallback={null}>
-        <Modal canBeOpened={true} modalName={Modals.HELLO}>
+        <Modal canBeRendered={true} modalId={Modals.HELLO}>
           <h1>Hi!</h1>
         </Modal>
 
         <Modal
-          canBeOpened={true}
-          modalName={Modals.CONFIRM}
+          canBeRendered={true}
+          modalId={Modals.CONFIRM}
           renderContent={(closeHandler) => {
             return (
             <div>
