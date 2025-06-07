@@ -1,0 +1,91 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: var(--dvh);
+  display: flex;
+  z-index: 1001;
+  animation: showPopup 0.4s ease;
+
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  padding: 50px;
+}
+
+.modal_bg_bright {
+  background-color: var(--red);
+}
+
+.modal_bg_light {
+  background-color: var(--bg);
+}
+
+.modal_isClosing {
+  animation: hidePopup 0.4s ease;
+}
+
+.modal__content {
+  position: relative;
+  z-index: 1;
+}
+
+.modal__closeBtn {
+  position: absolute;
+  z-index: 1;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  top: 20px;
+  right: 20px;
+}
+
+.modal__closeBtn_outer {
+  right: -54px;
+  top: 0;
+}
+
+.modal__closeIcon > path {
+  stroke: var(--primary-color);
+}
+
+.modal__closeBtn:active {
+  transform: scale(0.9);
+}
+
+@media screen and (hover: hover) {
+  .modal__closeBtn:hover {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes showPopup {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes hidePopup {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .modal {
+    padding: 20px;
+  }
+  
+  .modal__closeBtn_outer {
+    right: 0;
+    top: -44px;
+  }
+}
