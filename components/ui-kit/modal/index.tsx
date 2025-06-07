@@ -13,10 +13,18 @@ interface ModalProps {
   modalName: Modals;
   canBeOpened: boolean;
   scrollOnClose?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
+  renderContent?: (closeHandler: () => void) => ReactNode;
 }
 
-const Modal: FC<ModalProps> = ({ modalName, scrollOnClose = false, canBeOpened, children, onAfterClose }) => {
+const Modal: FC<ModalProps> = ({
+  modalName,
+  scrollOnClose = false,
+  canBeOpened,
+  children,
+  onAfterClose,
+  renderContent,
+}) => {
   const { isModalOpened, mountedPopup } = useModalState({ onAfterUnmount: onAfterClose });
 
   const pathname = usePathname();
@@ -43,6 +51,8 @@ const Modal: FC<ModalProps> = ({ modalName, scrollOnClose = false, canBeOpened, 
     }
   }, [canBeOpened, closeHandler, modalName, mountedPopup]);
 
+  const content = renderContent ? renderContent(closeHandler) : children;
+
   return (
     <>
       {canBeOpened && mountedPopup === modalName && (
@@ -53,7 +63,8 @@ const Modal: FC<ModalProps> = ({ modalName, scrollOnClose = false, canBeOpened, 
           onClick={closeHandler}
         >
           <div className={styles.modal__content} onClick={(e) => e.stopPropagation()}>
-            {children}
+            {content}
+            
             <button
               className={styles.modal__closeBtn}
               type="button"
