@@ -1,5 +1,5 @@
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface HookProps {
   destroyImmediately?: boolean;
@@ -8,14 +8,12 @@ interface HookProps {
 }
 
 const useModalState = (props?: HookProps) => {
+  const { destroyImmediately = false, destroyTimeout = 300, onAfterUnmount } = props || {};
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const { destroyImmediately = false, destroyTimeout = 300 } = props || {};
-
   const popupName = useSearchParams().get('modal');
   const [mountedPopup, setMountedPopup] = useState<string | null>(popupName);
 
-  const isModalOpened = useMemo(() => Boolean(popupName), [popupName]);
+  const isModalOpened = popupName !== null; // useMemo здесь избыточен
 
   useEffect(() => {
     if (popupName) {
@@ -27,28 +25,20 @@ const useModalState = (props?: HookProps) => {
       timeoutRef.current = setTimeout(
         () => {
           setMountedPopup(null);
-          if (props?.onAfterUnmount) {
-            props.onAfterUnmount();
-          }
+          onAfterUnmount?.();
         },
         destroyImmediately ? 0 : destroyTimeout,
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [popupName]);
 
-  useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, []);
+  }, [popupName, destroyImmediately, destroyTimeout, onAfterUnmount]); // все зависимости явные
 
-  return {
-    mountedPopup,
-    isModalOpened,
-  };
+  return { mountedPopup, isModalOpened };
 };
 
 export { useModalState };

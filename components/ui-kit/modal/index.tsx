@@ -39,6 +39,8 @@ const Modal: FC<ModalProps> = ({
 
   const content = renderContent ? renderContent(closeHandler) : children;
 
+  const shouldRender = canBeRendered && mountedPopup === modalId;
+
   useEffect(() => {
     const closeModalByEsc = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
@@ -46,18 +48,18 @@ const Modal: FC<ModalProps> = ({
       }
     };
 
-    if (canBeRendered && mountedPopup === modalId) {
+    if (shouldRender) {
       document.addEventListener('keydown', closeModalByEsc);
 
       return () => {
         document.removeEventListener('keydown', closeModalByEsc);
       };
     }
-  }, [canBeRendered, closeHandler, modalId, mountedPopup]);
+  }, [closeHandler, shouldRender]);
 
   return (
     <>
-      {canBeRendered && mountedPopup === modalId && (
+      {shouldRender && (
         <div
           className={cn(styles.modal, { [styles.modal_isClosing]: !isModalOpened })}
           role="dialog"
